@@ -1,0 +1,151 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getStaticMarketData } from '../lib/providers';
+import KpiGrid from '../components/KpiGrid.svelte';
+import DemoBadge from '../components/DemoBadge.svelte';
+import SourceLine from '../components/SourceLine.svelte';
+import RiskBadge from '../components/RiskBadge.svelte';
+import MapView from '../components/MapView.svelte';
+import OilChart from '../components/OilChart.svelte';
+import NewsSection from '../components/NewsSection.svelte';
+import TimelineList from '../components/TimelineList.svelte';
+
+const data = getStaticMarketData();
+const regions = data.regions.slice(0, 3);
+---
+
+<Layout
+  title="Dashboard"
+  description="Hormuz Watch — live-style shipping intelligence dashboard for the Strait of Hormuz. KPIs, map, oil prices, headlines and incident timeline. All data simulated."
+  currentPath="/"
+>
+  <!-- Hero -->
+  <section class="py-10 sm:py-14" aria-labelledby="hero-heading">
+    <p class="text-xs font-semibold tracking-[0.25em] text-cyan-400">
+      STRAIT OF HORMUZ · SHIPPING INTELLIGENCE
+    </p>
+    <h1 id="hero-heading" class="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white max-w-3xl">
+      Maritime intelligence for the world's most watched waterway
+    </h1>
+    <p class="mt-4 max-w-2xl text-slate-300">
+      Hormuz Watch tracks vessel movements, shipping routes, oil benchmarks and
+      market signals around the Strait of Hormuz — the chokepoint through which
+      roughly a fifth of the world's seaborne oil passes.
+    </p>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a href="/map" class="btn-primary">Explore the map</a>
+      <a href="/methodology" class="btn-ghost">How we handle data</a>
+    </div>
+    <div
+      class="mt-8 rounded-lg border border-amber-400/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200"
+      role="note"
+      aria-label="Demonstration data notice"
+    >
+      <strong class="font-semibold">Demonstration data:</strong> every figure, position,
+      price and headline on this dashboard is simulated for illustration only. Do not
+      use it for navigation, insurance, or trading decisions.
+    </div>
+  </section>
+
+  <!-- KPIs -->
+  <section aria-label="Key indicators">
+    <KpiGrid kpis={data.kpis} client:load />
+    <div class="mt-3">
+      <SourceLine source={data.sources.kpis} compact />
+    </div>
+  </section>
+
+  <!-- Map + risk summary -->
+  <section class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3" aria-label="Map and risk summary">
+    <div class="lg:col-span-2 panel panel-pad">
+      <h2 class="card-title mb-3">Strait of Hormuz — vessel traffic</h2>
+      <MapView
+        vessels={data.vessels}
+        routes={data.routes}
+        ports={data.ports}
+        height="420px"
+        client:only="svelte"
+      />
+      <div class="mt-3">
+        <SourceLine source={data.sources.vessels} compact />
+      </div>
+    </div>
+    <aside class="panel panel-pad" aria-label="Risk summary">
+      <h2 class="card-title">Risk summary</h2>
+      <div class="mt-3">
+        <RiskBadge level="elevated" />
+      </div>
+      <p class="mt-3 text-sm text-slate-300">
+        Simulated conditions show <strong class="text-white">elevated</strong> disruption risk in
+        the Strait. Insurance surcharges and rerouting pressure on tanker lanes are the
+        primary drivers in this illustrative scenario — none of this reflects live conditions.
+      </p>
+      <nav class="mt-6" aria-label="Quick links">
+        <p class="text-xs font-semibold tracking-widest text-slate-400 uppercase">Quick links</p>
+        <ul class="mt-2 space-y-2 text-sm">
+          <li><a href="/routes" class="text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2">Shipping routes</a></li>
+          <li><a href="/vessels" class="text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2">Vessel directory</a></li>
+          <li><a href="/oil" class="text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2">Oil &amp; markets</a></li>
+          <li><a href="/insurance" class="text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2">Insurance desk</a></li>
+          <li><a href="/timeline" class="text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2">Incident timeline</a></li>
+        </ul>
+      </nav>
+    </aside>
+  </section>
+
+  <!-- Oil chart -->
+  <section class="mt-10 panel panel-pad" aria-label="Crude oil benchmarks">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <h2 class="card-title">Brent vs WTI — simulated series</h2>
+      <DemoBadge quality="simulated" note="Illustrative price path, not market data" />
+    </div>
+    <OilChart series={data.oilSeries} title="Brent vs WTI — simulated series" client:only="svelte" />
+    <div class="mt-3">
+      <SourceLine source={data.sources.oil} compact />
+    </div>
+  </section>
+
+  <!-- News + timeline -->
+  <section class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2" aria-label="Headlines and incidents">
+    <NewsSection items={data.news} limit={4} title="Latest headlines" client:load />
+    <TimelineList incidents={data.incidents} title="Incident timeline" client:load />
+  </section>
+
+  <!-- Regional snapshot -->
+  <section class="mt-10" aria-label="Regional snapshot">
+    <div class="mb-4 flex items-baseline justify-between">
+      <h2 class="text-xl font-bold text-white">Regional snapshot</h2>
+      <a href="/regions" class="text-sm text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2">
+        All regions
+      </a>
+    </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+      {regions.map((region) => (
+        <article class="panel panel-pad">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="card-title">{region.region}</h3>
+            <RiskBadge level={region.riskLevel} />
+          </div>
+          <p class="mt-2 text-sm text-slate-300">{region.impactSummary}</p>
+          <dl class="mt-4 space-y-1.5 text-sm">
+            {region.keyStats.map((stat) => (
+              <div class="flex justify-between gap-2">
+                <dt class="text-slate-400">{stat.label}</dt>
+                <dd class="font-semibold text-white text-right">{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <a
+            href="/regions"
+            class="mt-4 inline-block text-sm text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2"
+          >
+            Explore regional impacts
+          </a>
+        </article>
+      ))}
+    </div>
+    <div class="mt-4">
+      <SourceLine source={data.sources.regions} compact />
+    </div>
+  </section>
+</Layout>

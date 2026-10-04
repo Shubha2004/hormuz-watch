@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-navy-950 text-slate-200 font-sans antialiased;
+}
+
+/* Accessible focus ring */
+:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Slim scrollbars for dense panels */
+.slim-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.slim-scroll::-webkit-scrollbar-track {
+  background: #0a1428;
+}
+.slim-scroll::-webkit-scrollbar-thumb {
+  background: #1f4479;
+  border-radius: 4px;
+}
+
+/* Leaflet dark-theme tweaks */
+.leaflet-container {
+  background: #0a1428;
+  font-family: inherit;
+}
+.leaflet-popup-content-wrapper {
+  background: #0c1830;
+  color: #e2e8f0;
+  border: 1px solid #1f4479;
+  border-radius: 8px;
+}
+.leaflet-popup-tip {
+  background: #0c1830;
+  border: 1px solid #1f4479;
+}
+.leaflet-popup-content {
+  margin: 12px 14px;
+  line-height: 1.45;
+}
+.leaflet-control-attribution {
+  background: rgba(5, 11, 22, 0.75) !important;
+  color: #64748b !important;
+  font-size: 10px !important;
+}
+.leaflet-control-attribution a {
+  color: #7d9cc4 !important;
+}
+.leaflet-bar a {
+  background: #0c1830 !important;
+  color: #e2e8f0 !important;
+  border-color: #1f4479 !important;
+}
+
+/* Reusable panel/card primitives */
+@layer components {
+  .panel {
+    @apply bg-navy-900 border border-navy-700/60 rounded-xl;
+  }
+  .panel-pad {
+    @apply p-4 sm:p-5;
+  }
+  .card-title {
+    @apply text-sm font-semibold tracking-wide text-slate-100 uppercase;
+  }
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-lg bg-cyan-500/15 border border-cyan-400/40 px-3 py-2 text-sm font-medium text-cyan-300 hover:bg-cyan-500/25 focus-visible:outline-cyan-300 transition-colors;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 rounded-lg border border-navy-600 px-3 py-2 text-sm text-slate-300 hover:border-cyan-400/50 hover:text-cyan-300 transition-colors;
+  }
+  .input-dark {
+    @apply w-full rounded-lg bg-navy-950 border border-navy-600 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-400/60 focus:outline-none;
+  }
+  .table-dark {
+    @apply w-full text-sm;
+  }
+  .table-dark thead th {
+    @apply text-left text-xs uppercase tracking-wider text-slate-400 font-semibold px-3 py-2 border-b border-navy-700;
+  }
+  .table-dark tbody td {
+    @apply px-3 py-2.5 border-b border-navy-800/60 align-top;
+  }
+  .table-dark tbody tr:hover {
+    @apply bg-navy-850/60;
+  }
+}

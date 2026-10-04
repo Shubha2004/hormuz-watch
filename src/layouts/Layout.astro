@@ -1,0 +1,48 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.svelte';
+import Footer from '../components/Footer.svelte';
+
+interface Props {
+  title: string;
+  description?: string;
+  currentPath?: string;
+}
+
+const {
+  title,
+  description = 'Hormuz Watch — shipping intelligence dashboard for the Strait of Hormuz. Demonstration data unless marked live.',
+  currentPath = '/'
+} = Astro.props;
+
+const canonical = `https://hormuz-watch.example.com${currentPath}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#050b16" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <title>{title} | Hormuz Watch</title>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-cyan-500 focus:px-3 focus:py-2 focus:text-navy-950"
+    >
+      Skip to main content
+    </a>
+    <Header currentPath={currentPath} client:load />
+    <main id="main-content" class="flex-1 w-full max-w-[1400px] mx-auto px-3 sm:px-5 py-5 sm:py-7">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

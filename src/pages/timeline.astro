@@ -1,0 +1,40 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TimelineList from '../components/TimelineList.svelte';
+import { getStaticMarketData } from '../lib/providers';
+
+const data = getStaticMarketData();
+---
+
+<Layout
+  title="Crisis timeline"
+  description="Illustrative scenario timeline of fictional maritime incidents for UI demonstration."
+  currentPath="/timeline"
+>
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white">Crisis timeline</h1>
+    <p class="mt-2 text-slate-400">
+      A chronological record of scenario events, newest first. Filter by severity.
+    </p>
+  </div>
+
+  <div class="mb-6 rounded-lg border border-amber-400/40 bg-amber-500/10 p-4 text-sm text-amber-200" role="note">
+    <p class="font-semibold">Fictional scenarios — not real events.</p>
+    <p class="mt-1 text-amber-200/80">
+      Every entry below is an illustrative fictional scenario created to demonstrate the timeline
+      interface. None of these incidents happened. They must never be quoted as facts, referenced
+      as news, or used for any operational purpose.
+    </p>
+  </div>
+
+  <TimelineList incidents={data.incidents} title="Scenario log" client:load />
+
+  <p class="mt-6 text-sm text-slate-400">
+    Scenarios like these are what analysts use in disruption modelling — ranges of outcomes rather
+    than predictions. See the
+    <a href="/regions" class="text-cyan-400 underline decoration-dotted underline-offset-2 hover:text-cyan-300"> regional analysis </a>
+    page for exposure assessments, and
+    <a href="/methodology" class="text-cyan-400 underline decoration-dotted underline-offset-2 hover:text-cyan-300"> methodology </a>
+    for how this data is labelled.
+  </p>
+</Layout>

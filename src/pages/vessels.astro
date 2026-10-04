@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getStaticMarketData } from '../lib/providers';
+import VesselTable from '../components/VesselTable.svelte';
+import SourceLine from '../components/SourceLine.svelte';
+
+const data = getStaticMarketData();
+---
+
+<Layout
+  title="Vessel Directory"
+  description="Fictional demo vessels in the Strait of Hormuz region: type, flag, position, speed and operator. Searchable directory."
+  currentPath="/vessels"
+>
+  <section class="py-8 sm:py-10" aria-labelledby="vessels-heading">
+    <h1 id="vessels-heading" class="text-2xl sm:text-3xl font-bold text-white">Vessel directory</h1>
+    <p class="mt-2 max-w-2xl text-slate-300">
+      Every vessel listed here is fictional — invented ships with simulated positions
+      and voyages to demonstrate the directory interface. None of these names,
+      IMO-style identifiers or positions correspond to real vessels.
+    </p>
+  </section>
+
+  <section aria-label="Vessel directory">
+    <VesselTable vessels={data.vessels} title="Vessels in the Hormuz region" client:load />
+    <div class="mt-3">
+      <SourceLine source={data.sources.vessels} compact />
+    </div>
+  </section>
+
+  <section class="mt-8 panel panel-pad" aria-label="Data note">
+    <h2 class="card-title mb-2">Why fictional vessels?</h2>
+    <p class="text-sm text-slate-300">
+      Real vessel tracking requires an AIS subscription and careful handling of
+      position data. This demo uses invented vessels so the interface can be explored
+      without any privacy, licensing or accuracy concerns. See
+      <a href="/methodology" class="text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2">our methodology</a>
+      for how a live version would connect to real data providers.
+    </p>
+  </section>
+</Layout>

@@ -1,0 +1,61 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RiskBadge from '../components/RiskBadge.svelte';
+import DemoBadge from '../components/DemoBadge.svelte';
+import SourceLine from '../components/SourceLine.svelte';
+import { getStaticMarketData } from '../lib/providers';
+
+const data = getStaticMarketData();
+---
+
+<Layout
+  title="Regional analysis"
+  description="Regional exposure assessment for Strait of Hormuz disruptions — estimates, not predictions."
+  currentPath="/regions"
+>
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white">Regional analysis</h1>
+    <p class="mt-2 max-w-3xl text-slate-400">
+      Exposure assessments for regions connected to strait transits. These are labelled estimates
+      describing exposure — they are not predictions of events. See
+      <a href="/methodology" class="text-cyan-400 underline decoration-dotted underline-offset-2 hover:text-cyan-300"> methodology </a>
+      for our data-integrity rules.
+    </p>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {data.regions.map((region) => (
+      <article class="panel panel-pad flex flex-col">
+        <div class="flex items-start justify-between gap-2">
+          <h2 class="card-title">{region.region}</h2>
+          <div class="flex items-center gap-2">
+            <RiskBadge level={region.riskLevel} client:load />
+            <DemoBadge quality={region.quality} client:load />
+          </div>
+        </div>
+        <p class="mt-3 text-sm font-medium text-slate-300">{region.exposure}</p>
+        <p class="mt-2 flex-1 text-sm leading-relaxed text-slate-400">{region.impactSummary}</p>
+        <table class="table-dark mt-4 w-full text-sm">
+          <caption class="sr-only">Key statistics for {region.region}</caption>
+          <tbody>
+            {region.keyStats.map((stat) => (
+              <tr>
+                <th scope="row" class="py-2 pr-3 text-left font-normal text-slate-400">{stat.label}</th>
+                <td class="py-2 text-right font-semibold text-slate-100">{stat.value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </article>
+    ))}
+  </div>
+
+  <div class="panel panel-pad mt-6">
+    <SourceLine source={data.sources.regions} client:load />
+    <p class="mt-2 text-sm text-slate-400">
+      Regional figures are model estimates for demonstration. For the full breakdown of data-quality
+      levels and provider architecture, see
+      <a href="/methodology" class="text-cyan-400 underline decoration-dotted underline-offset-2 hover:text-cyan-300"> methodology</a>.
+    </p>
+  </div>
+</Layout>

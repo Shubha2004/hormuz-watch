@@ -1,0 +1,94 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getStaticMarketData } from '../lib/providers';
+import MapView from '../components/MapView.svelte';
+import DemoBadge from '../components/DemoBadge.svelte';
+import SourceLine from '../components/SourceLine.svelte';
+
+const data = getStaticMarketData();
+---
+
+<Layout
+  title="Interactive Map"
+  description="Full interactive map of vessel positions, shipping routes and ports around the Strait of Hormuz. Positions are simulated."
+  currentPath="/map"
+>
+  <section class="py-8 sm:py-10" aria-labelledby="map-heading">
+    <h1 id="map-heading" class="text-2xl sm:text-3xl font-bold text-white">Interactive map</h1>
+    <p class="mt-2 max-w-2xl text-slate-300">
+      Vessel positions, port locations and major shipping lanes through the Strait of
+      Hormuz. Pan, zoom and toggle layers to explore. All positions are simulated —
+      this is a demonstration, not a navigation aid.
+    </p>
+  </section>
+
+  <section class="panel panel-pad" aria-label="Full map">
+    <MapView
+      vessels={data.vessels}
+      routes={data.routes}
+      ports={data.ports}
+      height="70vh"
+      showControls={true}
+      client:only="svelte"
+    />
+    <div class="mt-3">
+      <SourceLine source={data.sources.vessels} compact />
+    </div>
+  </section>
+
+  <section class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2" aria-label="Legend and notes">
+    <div class="panel panel-pad">
+      <h2 class="card-title mb-4">Legend</h2>
+      <ul class="space-y-2.5 text-sm text-slate-300">
+        <li class="flex items-center gap-3">
+          <span class="inline-block h-3 w-3 rounded-full bg-cyan-400" aria-hidden="true"></span>
+          Tanker
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="inline-block h-3 w-3 rounded-full bg-violet-400" aria-hidden="true"></span>
+          LNG carrier
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="inline-block h-3 w-3 rounded-full bg-emerald-400" aria-hidden="true"></span>
+          Container ship
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="inline-block h-3 w-3 rounded-full bg-amber-400" aria-hidden="true"></span>
+          Bulk carrier
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="inline-block h-3 w-3 rounded-full bg-slate-400" aria-hidden="true"></span>
+          General cargo
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="inline-block h-4 w-4 rounded-full border-2 border-amber-400 bg-navy-900" aria-hidden="true"></span>
+          Port / terminal (amber circles)
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="inline-block h-0 w-10 border-t-2 border-dashed border-cyan-400" aria-hidden="true"></span>
+          Shipping route (dashed; color follows the route's risk level)
+        </li>
+      </ul>
+    </div>
+    <div class="panel panel-pad">
+      <h2 class="card-title mb-4">Reading this map</h2>
+      <div class="mb-3">
+        <DemoBadge quality="simulated" note="All positions are fictional demonstration data" />
+      </div>
+      <ul class="space-y-2 text-sm text-slate-300">
+        <li>
+          Vessel markers are fictional ships placed in the Gulf of Oman, the Strait and
+          the northern Gulf to illustrate typical traffic patterns.
+        </li>
+        <li>
+          Route polylines are approximations of the main tanker and LNG lanes — they are
+          not official traffic separation schemes.
+        </li>
+        <li>
+          For the full data pipeline and caveats, see
+          <a href="/methodology" class="text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2">our methodology</a>.
+        </li>
+      </ul>
+    </div>
+  </section>
+</Layout>

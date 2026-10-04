@@ -1,0 +1,73 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getStaticMarketData } from '../lib/providers';
+import RiskBadge from '../components/RiskBadge.svelte';
+import MapView from '../components/MapView.svelte';
+import SourceLine from '../components/SourceLine.svelte';
+import DemoBadge from '../components/DemoBadge.svelte';
+
+const data = getStaticMarketData();
+---
+
+<Layout
+  title="Shipping Routes"
+  description="Major shipping routes through the Strait of Hormuz: transits, cargo and disruption risk. Route figures are simulated estimates."
+  currentPath="/routes"
+>
+  <section class="py-8 sm:py-10" aria-labelledby="routes-heading">
+    <h1 id="routes-heading" class="text-2xl sm:text-3xl font-bold text-white">Shipping routes</h1>
+    <p class="mt-2 max-w-2xl text-slate-300">
+      The principal tanker, LNG and container lanes that thread the Strait of Hormuz.
+      Weekly transit figures are illustrative estimates based on historical traffic
+      patterns — see the risk badge on each lane for the current simulated threat level.
+    </p>
+  </section>
+
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    {data.routes.map((route) => (
+      <article class="panel panel-pad" aria-labelledby={`route-${route.id}`}>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 id={`route-${route.id}`} class="card-title">{route.name}</h2>
+            <p class="mt-0.5 text-xs tracking-widest text-slate-400">{route.code}</p>
+          </div>
+          <RiskBadge level={route.riskLevel} />
+        </div>
+        <p class="mt-3 text-sm text-slate-300">{route.description}</p>
+        <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+          <div class="rounded-md bg-navy-900/60 px-3 py-2">
+            <dt class="text-xs text-slate-400">Weekly transits (est.)</dt>
+            <dd class="mt-0.5 text-lg font-bold text-white">{route.weeklyTransitsEstimate}</dd>
+          </div>
+          <div class="rounded-md bg-navy-900/60 px-3 py-2">
+            <dt class="text-xs text-slate-400">Primary cargo</dt>
+            <dd class="mt-0.5 text-lg font-bold text-white">{route.primaryCargo}</dd>
+          </div>
+        </dl>
+        <div class="mt-4 flex items-center justify-between">
+          <DemoBadge quality={route.quality} note="Transit figures are illustrative estimates" />
+          <a
+            href="/map"
+            class="text-sm text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2"
+          >
+            View on map
+          </a>
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <section class="mt-10 panel panel-pad" aria-label="Routes overview map">
+    <h2 class="card-title mb-3">Routes and ports overview</h2>
+    <MapView
+      vessels={[]}
+      routes={data.routes}
+      ports={data.ports}
+      height="420px"
+      client:only="svelte"
+    />
+    <div class="mt-3">
+      <SourceLine source={data.sources.routes} compact />
+    </div>
+  </section>
+</Layout>

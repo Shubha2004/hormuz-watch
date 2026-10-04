@@ -1,0 +1,170 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Data sources & methodology"
+  description="How Hormuz Watch labels data quality, where data comes from, provider architecture and limitations."
+  currentPath="/methodology"
+>
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white">Data sources &amp; methodology</h1>
+    <p class="mt-2 max-w-3xl text-slate-400">
+      This page documents how data reaches the dashboard, how its quality is labelled, and the
+      hard limits of what this demonstration build can tell you.
+    </p>
+  </div>
+
+  <section class="panel panel-pad mb-6" aria-labelledby="integrity">
+    <h2 id="integrity" class="card-title">Our data-integrity commitment</h2>
+    <ul class="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-300">
+      <li>
+        <strong class="text-white">Never fabricate.</strong> Every datum carries a quality level;
+        simulated demonstration values are never presented as observations.
+      </li>
+      <li>
+        <strong class="text-white">Label everything.</strong> Each panel shows a DEMO badge naming
+        its quality level and a source line with provenance and last-updated timestamp.
+      </li>
+      <li>
+        <strong class="text-white">Distinguish quality levels.</strong> Live, historical, estimate
+        and simulated data are visually and semantically distinct throughout the site.
+      </li>
+      <li>
+        <strong class="text-white">Attribute sources.</strong> Every section cites where its data
+        came from, so you can judge how much trust it deserves.
+      </li>
+    </ul>
+  </section>
+
+  <section class="panel panel-pad mb-6" aria-labelledby="taxonomy">
+    <h2 id="taxonomy" class="card-title">Data quality taxonomy</h2>
+    <p class="mt-2 text-sm text-slate-400">
+      Four quality levels are used across the dashboard. The badge next to every panel tells you
+      which one applies.
+    </p>
+    <div class="mt-4 overflow-x-auto">
+      <table class="table-dark w-full text-sm">
+        <thead>
+          <tr>
+            <th scope="col" class="py-2 pr-3 text-left">Level</th>
+            <th scope="col" class="py-2 pr-3 text-left">Meaning</th>
+            <th scope="col" class="py-2 text-left">Badge</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="py-2 pr-3 text-left font-semibold text-emerald-300">LIVE</th>
+            <td class="py-2 pr-3 text-slate-300">An observation fetched from a public source moments before display.</td>
+            <td class="py-2 text-slate-400">Emerald badge with a pulsing dot.</td>
+          </tr>
+          <tr>
+            <th scope="row" class="py-2 pr-3 text-left font-semibold text-sky-300">HISTORICAL</th>
+            <td class="py-2 pr-3 text-slate-300">A recorded fact from an archive — true for its time, not for now.</td>
+            <td class="py-2 text-slate-400">Sky-blue badge.</td>
+          </tr>
+          <tr>
+            <th scope="row" class="py-2 pr-3 text-left font-semibold text-amber-300">ESTIMATE</th>
+            <td class="py-2 pr-3 text-slate-300">A model-based approximation. Directionally useful; not a measurement.</td>
+            <td class="py-2 text-slate-400">Amber badge.</td>
+          </tr>
+          <tr>
+            <th scope="row" class="py-2 pr-3 text-left font-semibold text-amber-300">SIMULATED</th>
+            <td class="py-2 pr-3 text-slate-300">Invented demonstration data bundled with the app. Not real.</td>
+            <td class="py-2 text-slate-400">Amber badge.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel panel-pad mb-6" aria-labelledby="providers">
+    <h2 id="providers" class="card-title">Provider architecture</h2>
+    <div class="mt-3 space-y-4 text-sm leading-relaxed text-slate-300">
+      <p>
+        All data flows through a single provider layer (<code class="text-cyan-300">loadMarketData()</code>)
+        that assembles one <code class="text-cyan-300">MarketData</code> object every UI component
+        consumes. By default it serves the bundled demonstration dataset, with every section carrying
+        a SIMULATED or ESTIMATE quality badge.
+      </p>
+      <p>
+        The provider then <em>attempts</em> keyless live sources — currently the GDELT 2.1 news API —
+        before display. Any failure (network error, malformed payload, disabled flag, timeout) falls
+        back gracefully to the bundled demo items for that section, and the UI keeps its DEMO badge.
+        A section is only labelled LIVE when a provider returned validated data. External responses
+        are validated against a schema before use, and the provider never throws: the worst case is
+        the full demo dataset.
+      </p>
+      <p>
+        Keyed providers — such as EIA for energy prices or commercial AIS vendors for vessel
+        positions — are intentionally <strong class="text-white">not</strong> called from the browser.
+        They are documented in <code class="text-cyan-300">.env.example</code> for a future
+        server-side deployment, where API keys can be kept out of client-side JavaScript.
+      </p>
+    </div>
+  </section>
+
+  <section class="panel panel-pad mb-6" aria-labelledby="env">
+    <h2 id="env" class="card-title">Environment variables</h2>
+    <p class="mt-2 text-sm text-slate-400">
+      From <code class="text-cyan-300">.env.example</code>. Only variables prefixed
+      <code class="text-cyan-300">PUBLIC_</code> are exposed to the browser — secrets must never use
+      that prefix.
+    </p>
+    <div class="mt-4 overflow-x-auto">
+      <table class="table-dark w-full text-sm">
+        <thead>
+          <tr>
+            <th scope="col" class="py-2 pr-3 text-left">Variable</th>
+            <th scope="col" class="py-2 pr-3 text-left">Default</th>
+            <th scope="col" class="py-2 text-left">Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="py-2 pr-3 text-left font-mono text-cyan-300">PUBLIC_DEMO_MODE</th>
+            <td class="py-2 pr-3 font-mono text-slate-400">true</td>
+            <td class="py-2 text-slate-300">Master switch: when true, all panels render demo data with a DEMO badge even if a live provider is configured.</td>
+          </tr>
+          <tr>
+            <th scope="row" class="py-2 pr-3 text-left font-mono text-cyan-300">PUBLIC_GDELT_ENABLED</th>
+            <td class="py-2 pr-3 font-mono text-slate-400">true</td>
+            <td class="py-2 text-slate-300">Attempt the keyless GDELT news API before falling back to bundled demo headlines.</td>
+          </tr>
+          <tr>
+            <th scope="row" class="py-2 pr-3 text-left font-mono text-cyan-300">PUBLIC_MAP_TILES_URL</th>
+            <td class="py-2 pr-3 font-mono text-slate-400">CARTO dark</td>
+            <td class="py-2 text-slate-300">Tile URL template for the Leaflet map; defaults to the free CARTO dark basemap (attribution required).</td>
+          </tr>
+          <tr>
+            <th scope="row" class="py-2 pr-3 text-left font-mono text-cyan-300">EIA_API_KEY</th>
+            <td class="py-2 pr-3 font-mono text-slate-400">(unset)</td>
+            <td class="py-2 text-slate-300">Server-side only. US Energy Information Administration key for real energy price data — never expose in the browser.</td>
+          </tr>
+          <tr>
+            <th scope="row" class="py-2 pr-3 text-left font-mono text-cyan-300">MARINETRAFFIC_API_KEY</th>
+            <td class="py-2 pr-3 font-mono text-slate-400">(unset)</td>
+            <td class="py-2 text-slate-300">Server-side only. Commercial AIS vendor key for real vessel positions — never expose in the browser.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel panel-pad mb-6" aria-labelledby="limitations">
+    <h2 id="limitations" class="card-title">Limitations</h2>
+    <ul class="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-300">
+      <li>No real-time AIS feed is connected — vessel positions on this build are fictional.</li>
+      <li>Oil and market price series are simulated for demonstration; they do not track real markets.</li>
+      <li>Timeline entries are illustrative fictional scenarios, not real events.</li>
+      <li>Regional impact figures are exposure estimates, not predictions of disruption.</li>
+      <li>Insurance figures are illustrative estimates, never quotes or advice.</li>
+      <li>This site is not for trading, investment, navigation or safety-critical decisions.</li>
+    </ul>
+  </section>
+
+  <p class="text-sm text-slate-400">
+    Questions? Try the <a href="/faq" class="text-cyan-400 underline decoration-dotted underline-offset-2 hover:text-cyan-300">FAQ &amp; glossary</a>
+    or learn more on the <a href="/about" class="text-cyan-400 underline decoration-dotted underline-offset-2 hover:text-cyan-300">about</a> page.
+  </p>
+</Layout>

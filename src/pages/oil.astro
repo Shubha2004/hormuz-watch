@@ -1,0 +1,91 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getStaticMarketData } from '../lib/providers';
+import OilChart from '../components/OilChart.svelte';
+import DemoBadge from '../components/DemoBadge.svelte';
+import SourceLine from '../components/SourceLine.svelte';
+
+const data = getStaticMarketData();
+---
+
+<Layout
+  title="Oil & Markets"
+  description="Simulated Brent and WTI price series plus market indicators for the Strait of Hormuz. Demonstration data only — never use for trading."
+  currentPath="/oil"
+>
+  <section class="py-8 sm:py-10" aria-labelledby="oil-heading">
+    <h1 id="oil-heading" class="text-2xl sm:text-3xl font-bold text-white">Oil prices &amp; market indicators</h1>
+    <p class="mt-2 max-w-2xl text-slate-300">
+      How a Strait of Hormuz disruption scenario would show up in crude benchmarks
+      and related market signals.
+    </p>
+  </section>
+
+  <div
+    class="mb-8 rounded-lg border border-amber-400/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200"
+    role="alert"
+    aria-label="Simulated prices warning"
+  >
+    <strong class="font-semibold">Demonstration prices:</strong> the Brent/WTI series and every
+    market indicator on this page are simulated values for illustration only. They are not
+    market data and must never be used for trading, hedging or investment decisions.
+  </div>
+
+  <section class="panel panel-pad" aria-label="Crude benchmarks chart">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <h2 class="card-title">Brent vs WTI — simulated series</h2>
+      <DemoBadge quality="simulated" note="Illustrative price path, not market data" />
+    </div>
+    <OilChart series={data.oilSeries} title="Brent vs WTI — simulated series" client:only="svelte" />
+    <div class="mt-3">
+      <SourceLine source={data.sources.oil} compact />
+    </div>
+  </section>
+
+  <section class="mt-10" aria-label="Market indicators">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+      <h2 class="text-xl font-bold text-white">Market indicators</h2>
+      <a href="/insurance" class="text-sm text-cyan-400 hover:text-cyan-300 underline decoration-dotted underline-offset-2">
+        Insurance desk
+      </a>
+    </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {data.marketIndicators.map((indicator) => {
+        const positive = indicator.changePct > 0;
+        const negative = indicator.changePct < 0;
+        return (
+          <article class="panel panel-pad" aria-labelledby={`ind-${indicator.id}`}>
+            <h3 id={`ind-${indicator.id}`} class="text-sm font-semibold text-slate-200">{indicator.label}</h3>
+            <p class="mt-2 text-2xl font-bold text-white">{indicator.value}</p>
+            <p
+              class={`mt-1 text-sm font-semibold ${positive ? 'text-emerald-400' : negative ? 'text-red-400' : 'text-slate-400'}`}
+            >
+              {positive ? '▲' : negative ? '▼' : '—'}{' '}
+              {positive ? '+' : ''}{indicator.changePct.toFixed(2)}%
+            </p>
+            <div class="mt-3">
+              <DemoBadge quality={indicator.quality} note="Simulated indicator value" />
+            </div>
+          </article>
+        );
+      })}
+    </div>
+    <div class="mt-4">
+      <SourceLine source={data.sources.markets} compact />
+    </div>
+  </section>
+
+  <section class="mt-10 panel panel-pad" aria-label="About the benchmarks">
+    <h2 class="card-title mb-2">What are Brent and WTI?</h2>
+    <p class="text-sm text-slate-300">
+      <strong class="text-white">Brent</strong> is the global benchmark for roughly two-thirds of
+      internationally traded crude, priced off North Sea grades and delivered through the
+      Atlantic basin. <strong class="text-white">WTI (West Texas Intermediate)</strong> is the US
+      benchmark, priced at Cushing, Oklahoma, and generally reflects North American supply and
+      demand. Because Hormuz moves mostly Middle Eastern crude that prices against Brent-linked
+      grades, analysts watch the Brent–WTI spread — and tanker insurance and freight costs —
+      as early signals of Strait disruption. The series above simulates such a move; it is not
+      real price history.
+    </p>
+  </section>
+</Layout>

@@ -1,0 +1,64 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DemoBadge from '../../components/DemoBadge.svelte';
+import { demoPosts } from '../../lib/demo-data';
+
+function formatDate(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC'
+  });
+}
+---
+
+<Layout
+  title="Blog & analysis"
+  description="Explainers and analysis on war-risk insurance, AIS data, strait geography and disruption modelling."
+  currentPath="/blog"
+>
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white">Blog &amp; analysis</h1>
+    <p class="mt-2 max-w-3xl text-slate-400">
+      Plain-language explainers on the shipping, insurance and data topics behind the dashboard.
+      Editorial content written for demonstration — not news reporting.
+    </p>
+  </div>
+
+  <div class="mb-6 flex items-center gap-2">
+    <DemoBadge quality="simulated" note="Editorial demonstration articles, not news reporting." client:load />
+    <span class="text-xs text-slate-500">All articles are editorial demonstration content.</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    {demoPosts.map((post) => (
+      <article class="panel panel-pad flex flex-col transition-colors hover:border-cyan-400/30">
+        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          <time datetime={post.date}>{formatDate(post.date)}</time>
+          <span aria-hidden="true">·</span>
+          <span>{post.readingMinutes} min read</span>
+          <span aria-hidden="true">·</span>
+          <span>{post.author}</span>
+        </div>
+        <h2 class="mt-2 text-lg font-bold leading-snug text-white">
+          <a href={`/blog/${post.slug}`} class="hover:text-cyan-300">{post.title}</a>
+        </h2>
+        <p class="mt-2 flex-1 text-sm leading-relaxed text-slate-400">{post.excerpt}</p>
+        <div class="mt-4 flex items-center justify-between gap-2">
+          <div class="flex flex-wrap gap-1.5">
+            {post.tags.map((tag) => (
+              <span class="rounded-full bg-navy-700/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                {tag}
+              </span>
+            ))}
+          </div>
+          <a href={`/blog/${post.slug}`} class="btn-ghost shrink-0" aria-label={`Read: ${post.title}`}>
+            Read
+          </a>
+        </div>
+      </article>
+    ))}
+  </div>
+</Layout>

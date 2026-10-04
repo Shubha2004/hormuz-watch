@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NewsSection from '../components/NewsSection.svelte';
+import SourceLine from '../components/SourceLine.svelte';
+import { getStaticMarketData } from '../lib/providers';
+
+const data = getStaticMarketData();
+---
+
+<Layout
+  title="News feed"
+  description="Maritime headlines for the Strait of Hormuz: shipping, energy, geopolitics and insurance."
+  currentPath="/news"
+>
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white">News feed</h1>
+    <p class="mt-2 text-slate-400">
+      Headlines across shipping, energy, geopolitics and insurance. Search or filter by category.
+    </p>
+  </div>
+
+  <NewsSection items={data.news} explorable={true} title="Maritime headlines" client:load />
+
+  <div class="panel panel-pad mt-6">
+    <h2 class="card-title">Where do these headlines come from?</h2>
+    <p class="mt-2 text-sm leading-relaxed text-slate-300">
+      When demo mode is switched off, the dashboard attempts to fetch live headlines through the
+      keyless GDELT 2.1 news API. If that attempt fails — network error, blocked response or disabled
+      flag — it falls back to bundled demonstration headlines, and every panel keeps its data-quality
+      badge. Headlines are provided as-is and are not verified reporting.
+    </p>
+    <div class="mt-3">
+      <SourceLine source={data.sources.news} client:load />
+    </div>
+    <p class="mt-3 text-sm">
+      <a href="/methodology" class="text-cyan-400 underline decoration-dotted underline-offset-2 hover:text-cyan-300">
+        See the full methodology and provider architecture
+      </a>
+    </p>
+  </div>
+</Layout>

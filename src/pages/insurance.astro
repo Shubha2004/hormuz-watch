@@ -1,0 +1,90 @@
+---
+import Layout from '../layouts/Layout.astro';
+import DemoBadge from '../components/DemoBadge.svelte';
+import SourceLine from '../components/SourceLine.svelte';
+import { getStaticMarketData } from '../lib/providers';
+
+const data = getStaticMarketData();
+
+const trendGlyph: Record<'up' | 'down' | 'flat', { glyph: string; color: string; label: string }> = {
+  up: { glyph: '↗', color: 'text-amber-400', label: 'Rising' },
+  down: { glyph: '↘', color: 'text-emerald-400', label: 'Falling' },
+  flat: { glyph: '→', color: 'text-slate-400', label: 'Stable' }
+};
+---
+
+<Layout
+  title="Insurance & maritime risk"
+  description="Illustrative estimates of war-risk premiums and marine insurance indicators for Strait of Hormuz transits."
+  currentPath="/insurance"
+>
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white">Insurance &amp; maritime risk</h1>
+    <p class="mt-2 text-slate-400">
+      How insurers price the risk of a Strait of Hormuz transit — and why it matters for energy costs.
+    </p>
+  </div>
+
+  <div class="mb-6 rounded-lg border border-amber-400/40 bg-amber-500/10 p-4 text-sm text-amber-200" role="note">
+    <p class="font-semibold">Illustrative estimates — not quotes.</p>
+    <p class="mt-1 text-amber-200/80">
+      Every figure on this page is a demonstration estimate. Real war-risk premiums are negotiated
+      privately between brokers and underwriters and are never published on a dashboard like this one.
+      Never use these figures for commercial decisions.
+    </p>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {data.insurance.map((item) => {
+      const t = trendGlyph[item.trend];
+      return (
+        <div class="panel panel-pad flex flex-col">
+          <div class="flex items-start justify-between gap-2">
+            <h2 class="card-title">{item.label}</h2>
+            <DemoBadge quality={item.quality} client:load />
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <p class="text-3xl font-bold text-white">{item.value}</p>
+            <span class={`text-2xl font-bold ${t.color}`} aria-label={t.label} title={t.label}>
+              {t.glyph}
+            </span>
+          </div>
+          <p class="mt-2 flex-1 text-sm leading-relaxed text-slate-400">{item.detail}</p>
+          <div class="mt-4 border-t border-navy-700/60 pt-3">
+            <SourceLine source={item.source} client:load />
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  <section class="panel panel-pad mt-8" aria-labelledby="how-pricing-works">
+    <h2 id="how-pricing-works" class="card-title">How war-risk pricing works</h2>
+    <div class="mt-3 space-y-4 text-sm leading-relaxed text-slate-300">
+      <p>
+        When a merchant vessel transits an area that marine underwriters consider risky, the standard
+        hull policy is not enough. Shipowners buy <strong class="text-white">war-risk cover</strong> —
+        an additional premium, usually quoted as a percentage of the vessel's insured value, for a
+        defined period, often in 7-day blocks. Areas are listed by market bodies when perceived risk
+        rises, and entering a listed area without the required cover can void the policy.
+      </p>
+      <p>
+        The price moves with perceived risk: regional tension, incident reports, naval activity and
+        reinsurance costs all feed into underwriters' assessments. A higher premium does not just
+        affect the shipowner — it is passed through the charter chain and ultimately raises the
+        delivered cost of crude oil, LNG and containerised goods for importers and consumers.
+      </p>
+      <p>
+        Alongside hull war-risk cover, owners arrange related products: P&amp;I clubs provide mutual
+        liability cover, loss-of-hire insurance protects earnings lost during delays, and charterers
+        may take contingency cover of their own. Together these products form the insurance
+        cost of a transit — a cost that spikes far faster than freight rates when tensions rise.
+      </p>
+    </div>
+    <p class="mt-4 text-sm">
+      <a href="/methodology" class="text-cyan-400 underline decoration-dotted underline-offset-2 hover:text-cyan-300">
+        Read our methodology and data-quality rules
+      </a>
+    </p>
+  </section>
+</Layout>
